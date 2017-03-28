@@ -18,8 +18,24 @@ class Welcome extends CI_Controller {
 	 * map to /index.php/welcome/<method_name>
 	 * @see https://codeigniter.com/user_guide/general/urls.html
 	 */
+
+	public $smartie;
+
+	public function __construct()
+  {
+		$this->smartie = new Smarty();
+  }
+
 	public function index()
 	{
-		$this->load->view('welcome_message');
+		$this->smartie->assign('title','CI3 TODO LIST');
+	  $this->smartie->assign('header','TODO LIST');
+		$this->smartie->display('home_page.tpl');
+
+	}
+
+	public function item()
+	{
+		echo 'caca';
 	}
 }
