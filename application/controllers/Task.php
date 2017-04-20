@@ -21,7 +21,6 @@ class Task extends CI_Controller {
 
 	public $smartie;
 
-
 	public function __construct()
   {
 		parent::__construct();
@@ -34,56 +33,58 @@ class Task extends CI_Controller {
 	public function index()
 	{
 		// show all tasks
-		$tasks = ['shopping', 'go running', 'pick up Shaila from school'];
-
-		$this->smartie->assign('title','CI3 TODO LIST');
-		$this->smartie->assign('subtitle','Showing All Tasks');
-		$this->smartie->assign('tasks', $tasks);
-		$this->smartie->display('header.tpl');
-		$this->smartie->display('home_page.tpl');
-		$this->smartie->display('footer.tpl');
+		$this->db->order_by('ts', 'DESC');
+		$query = $this->db->get('tasks');
+		$data['tasks'] = $query->result();
+		$data['total'] = $query->num_rows();
+		$this->smartie->display('master_layout.tpl', $data);
 
 	}
 
 	public function task_get($id)
 	{
-		// show task
+		// show one task
 		echo 'task ' . $id;
 	}
 
 	public function task_create()
 	{
-		$this->smartie->assign('title','CI3 CREATE TASK - TODO LIST');
-		$this->smartie->assign('subtitle','Create New Task');
-		$this->smartie->display('header.tpl');
+		// create task
 		$this->smartie->display('create_task.tpl');
-		$this->smartie->display('footer.tpl');
 	}
 
 	public function task_put()
 	{
-		// create task
-		$this->smartie->assign('title','CI3 TASK CREATED - TODO LIST');
-		$this->smartie->assign('subtitle','Task Created!');
-		$this->smartie->display('header.tpl');
+		// created task
+		$this->db->insert('tasks', ['name' => $this->input->post('task-name')]);
 		$this->smartie->display('task_created_success.tpl');
-		$this->smartie->display('footer.tpl');
 	}
 
-	public function task_post($id)
+	public function task_edit($id)
 	{
-		$data['id'] = $id;
 		// edit task
-		$this->smartie->assign('title','CI3 EDIT TASK - TODO LIST');
-		$this->smartie->assign('subtitle','Editing Task' . $id);
-		$this->smartie->display('header.tpl');
+		$query = $this->db->get_where('tasks', ['id' => $id]);
+		$data['task'] = $query->row();
+		$data['id'] = $id;
+
 		$this->smartie->display('edit_task.tpl', $data);
-		$this->smartie->display('footer.tpl');
+	}
+
+	public function task_update()
+	{
+		// update task
+
+		$this->db->update('tasks',
+				['name' => $this->input->post('task-name')],
+				['id' => $this->input->post('id')]);
+
+		redirect('/tasks');
 	}
 
 	public function task_delete($id)
 	{
 		// delete task
+		$this->db->delete('tasks', ['id' => $id]);
 		echo 'task ' . $id . ' Deleted';
 	}
 }
